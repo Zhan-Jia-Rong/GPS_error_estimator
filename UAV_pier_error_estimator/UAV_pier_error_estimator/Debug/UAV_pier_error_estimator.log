@@ -1,2 +1,4 @@
 ﻿  error_estimator.cpp
+C:\Users\ITRI2021\Desktop\jiarong_file\gps_error_estimator\UAV_pier_error_estimator\UAV_pier_error_estimator\error_estimator.cpp(85,45): warning C4018: '>=': signed/unsigned 不相符
+C:\Users\ITRI2021\Desktop\jiarong_file\gps_error_estimator\UAV_pier_error_estimator\UAV_pier_error_estimator\error_estimator.cpp(129,45): warning C4018: '>=': signed/unsigned 不相符
   UAV_pier_error_estimator.vcxproj -> C:\Users\ITRI2021\Desktop\jiarong_file\gps_error_estimator\UAV_pier_error_estimator\Debug\UAV_pier_error_estimator.exe

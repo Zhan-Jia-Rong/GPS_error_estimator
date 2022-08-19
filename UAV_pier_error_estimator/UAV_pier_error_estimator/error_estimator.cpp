@@ -2,10 +2,18 @@
 #include "stdio.h"
 #include "math.h"
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <cstring>
 #include "vector"
 #include "corecrt_math_defines.h"
+#include "iomanip"
 
 using namespace std;
+
+vector<double>our_data;
+vector<double>gt_data;
+
 
 std::vector<double> vinc(double latp, double latc, double longp, double longc)
 {
@@ -57,14 +65,115 @@ std::vector<double> vinc(double latp, double latc, double longp, double longc)
     std::cout << "dis=" << v[0] << "m  deg=" << v[1] * 180 / M_PI << std::endl;
     return v;
 }
+void ours_detection()
+{
+    ifstream sr("gps_test.csv", ios::in);
+    if (!sr)
+    {
+        cout << "開啟檔案失敗！" << endl;
+        exit(1);
+    }
+    string line;
+    string ours_lat;
+    string ours_long;
+
+    char del=',';
+    int b = 0;
+    while (getline(sr, line)) //read csv 
+    {
+        int a = line.find(',');
+        if (a == line.length() - 1 || a + 1 >= line.length())
+        {
+            cout << line <<" <-Error input" << endl;
+            break;
+        }
+        if (b == 1)
+        {
+            double lat1 = stod(ours_lat);
+            double lat2 = stod(line.substr(0, a));
+            double long1 = stod(ours_long);
+            double long2 = stod(line.substr(a + 1, line.length()));
+
+            vector<double>error(2); 
+            error = vinc(lat1, lat2, long1, long2);
+            our_data.push_back(error[0]);
+            //cout << lat1 << " " << long1 << "\n" << lat2 << " " << long2 << "\n\n" << endl;
+            b = 0;
+        }
+
+        ours_lat = line.substr(0,a);
+        ours_long = line.substr(a+1, line.length());
+
+        b = 1;
+        
+        
+    }
+}
+void hsr_ground_truth()
+{
+    ifstream sr("gps_gt.csv", ios::in);
+    if (!sr)
+    {
+        cout << "開啟檔案失敗！" << endl;
+        exit(1);
+    }
+    string line;
+    string ours_lat;
+    string ours_long;
+
+    char del = ',';
+    int b = 0;
+    while (getline(sr, line)) //read csv 
+    {
+        int a = line.find(',');
+        if (a == line.length() - 1 || a + 1 >= line.length())
+        {
+            cout << line << " <-Error input" << endl;
+            break;
+        }
+        if (b == 1)
+        {
+            double lat1 = stod(ours_lat);
+            double lat2 = stod(line.substr(0, a));
+            double long1 = stod(ours_long);
+            double long2 = stod(line.substr(a + 1, line.length()));
+
+            vector<double>error(2);
+            error = vinc(lat1, lat2, long1, long2);
+            gt_data.push_back(error[0]);
+            //cout << lat1 << " " << long1 << "\n" << lat2 << " " << long2 << "\n\n" << endl;
+            b = 0;
+        }
+
+        ours_lat = line.substr(0, a);
+        ours_long = line.substr(a + 1, line.length());
+
+        b = 1;
+
+
+    }
+}
 
 int main()
 {
+    double ans = 0;
+    /*
     double lat1, lat2, long1, long2;
     lat1 = 24.79573446;
     lat2 = 24.79576845;
     long1 = 121.0367003;
     long2 = 121.0366977;
     vinc(lat1, lat2, long1, long2);
+    */
+    ours_detection();
+    hsr_ground_truth();
+    for (int i = 0; i != our_data.size(); i++)
+    {
+        ans = ans + our_data[i] - gt_data[i];
+    }
+    ans = ans / our_data.size();
+
+    cout << "Total error=" << ans << endl;
+
     return 0;
 }
